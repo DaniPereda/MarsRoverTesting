@@ -1,0 +1,19 @@
+tests a DrivingService
+
+Check createPlateau
+Check placeRover inside Plateau (direction & position)
+Check placeRover outside Plateau (N, S, E, W)
+
+Check processMovementOrders(List<Orders>)
+    N --> E
+    E --> N
+    S --> E
+    E --> S
+    W --> N
+    W --> S
+    S --> W
+    N --> S
+
+    M Inside the plateau NSEW
+    M Outside the plateau in Final Position
+    M Outside the Plateau in intermediate position
