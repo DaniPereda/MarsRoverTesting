@@ -14,33 +14,33 @@ class MainApplication (val communicator:Communicator, val translator:Translator)
     fun start() {
         var positionWithDirection = PositionWithDirection(communicator.retrieveInitialPosition(), translator.translateDirection(communicator.retrieveInitialRowDirection()))
 
-        initPlateau()
+        val plateau = initPlateau()
         initRover(positionWithDirection)
 
-        positionWithDirection = moveRover()
+        var rover = moveRover(positionWithDirection, plateau)
 
-        printResult(positionWithDirection)
+        printResult(rover)
     }
 
-    private fun printResult(positionWithDirection: PositionWithDirection) {
-        if (drivingService.rover.error != Errors.WITHOUT_ERRORS) {
+    private fun printResult(rover: Rover) {
+        if (rover.error != Errors.WITHOUT_ERRORS) {
 
         }else {
-            val formattedPositionWithDirection = translator.positionWithDirectiontoString(positionWithDirection)
+            val formattedPositionWithDirection = translator.resultToString(rover)
             communicator.printPositionWithDirection(formattedPositionWithDirection)
         }
     }
 
-    private fun moveRover(): PositionWithDirection {
-        return drivingService.processMovementOrders(getListOfTranslatedOrders())
+    private fun moveRover(positionWithDirection: PositionWithDirection, plateau:Plateau):Rover {
+        return drivingService.processMovementOrders(positionWithDirection, getListOfTranslatedOrders())
     }
 
     private fun initRover(positionWithDirection: PositionWithDirection) {
         drivingService.placeRover(positionWithDirection)
     }
 
-    private fun initPlateau() {
-        drivingService.createPlateau(communicator.retrieveSizeMap())
+    private fun initPlateau():Plateau {
+        return drivingService.createPlateau(communicator.retrieveSizeMap())
     }
 
 

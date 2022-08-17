@@ -14,8 +14,7 @@ internal class DrivingServiceTest {
 
 
         // WHEN
-        sut.createPlateau(size)
-        val result = sut.plateau
+        val result = sut.createPlateau(size)
 
         // THEN
         assertEquals(result, Plateau(size))
@@ -32,14 +31,10 @@ internal class DrivingServiceTest {
 
 
         // WHEN
-        sut.createPlateau(sizeZeroWidth)
-        val resultZeroWidth = sut.plateau
-        sut.createPlateau(sizeZeroHeight)
-        val resultZeroHeight = sut.plateau
-        sut.createPlateau(sizeNegativeWidth)
-        val resultNegativeWidth = sut.plateau
-        sut.createPlateau(sizeNegativeHeight)
-        val resultNegativeHeight = sut.plateau
+        val resultZeroWidth = sut.createPlateau(sizeZeroWidth)
+        val resultZeroHeight = sut.createPlateau(sizeZeroHeight)
+        val resultNegativeWidth = sut.createPlateau(sizeNegativeWidth)
+        val resultNegativeHeight = sut.createPlateau(sizeNegativeHeight)
 
         // THEN
         assertEquals(resultZeroWidth, Plateau(Size(0,0)))
@@ -60,14 +55,10 @@ internal class DrivingServiceTest {
 
 
         // WHEN
-        sut.placeRover(position45N)
-        val result45N = sut.rover.positionWithDirection
-        sut.placeRover(position12S)
-        val result12S = sut.rover.positionWithDirection
-        sut.placeRover(position09E)
-        val result09E = sut.rover.positionWithDirection
-        sut.placeRover(position90W)
-        val result90W = sut.rover.positionWithDirection
+        val result45N = sut.placeRover(position45N).positionWithDirection
+        val result12S = sut.placeRover(position12S).positionWithDirection
+        val result09E = sut.placeRover(position09E).positionWithDirection
+        val result90W = sut.placeRover(position90W).positionWithDirection
 
         // THEN
         assertEquals(result45N, PositionWithDirection(Position(4,5),Directions.NORTH))
@@ -88,14 +79,11 @@ internal class DrivingServiceTest {
         val positionOutW = PositionWithDirection(Position(5,-1), Directions.WEST)
 
         // WHEN
-        sut.placeRover(positionOutN)
-        val resultRoverOutN = sut.rover.error
-        sut.placeRover(positionOutS)
-        val resultRoverOutS = sut.rover.error
-        sut.placeRover(positionOutE)
-        val resultRoverOutE = sut.rover.error
-        sut.placeRover(positionOutW)
-        val resultRoverOutW = sut.rover.error
+
+        val resultRoverOutN = sut.placeRover(positionOutN).error
+        val resultRoverOutS =  sut.placeRover(positionOutS).error
+        val resultRoverOutE = sut.placeRover(positionOutE).error
+        val resultRoverOutW = sut.placeRover(positionOutW).error
 
         // THEN
         assertEquals(Errors.ERROR_OUT_OF_PLATEAU, resultRoverOutN)
@@ -109,18 +97,12 @@ internal class DrivingServiceTest {
 
         // GIVEN
         val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(5, 5),Directions.NORTH))
 
         // WHEN
-        sut.processMovementOrders(listOf(Orders.LEFT))
-        val directionW = sut.rover.positionWithDirection.direction
-        sut.processMovementOrders(listOf(Orders.LEFT))
-        val directionS = sut.rover.positionWithDirection.direction
-        sut.processMovementOrders(listOf(Orders.LEFT))
-        val directionE = sut.rover.positionWithDirection.direction
-        sut.processMovementOrders(listOf(Orders.LEFT))
-        val directionN = sut.rover.positionWithDirection.direction
+        val directionW = sut.processMovementOrders(PositionWithDirection(Position(5, 5),Directions.NORTH),  listOf(Orders.LEFT)).positionWithDirection.direction
+        val directionS = sut.processMovementOrders(PositionWithDirection(Position(5, 5),directionW),  listOf(Orders.LEFT)).positionWithDirection.direction
+        val directionE = sut.processMovementOrders(PositionWithDirection(Position(5, 5),directionS),  listOf(Orders.LEFT)).positionWithDirection.direction
+        val directionN = sut.processMovementOrders(PositionWithDirection(Position(5, 5),directionE),  listOf(Orders.LEFT)).positionWithDirection.direction
 
         // THEN
         assertEquals(Directions.WEST, directionW)
@@ -134,18 +116,12 @@ internal class DrivingServiceTest {
 
         // GIVEN
         val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(5, 5),Directions.NORTH))
 
         // WHEN
-        sut.processMovementOrders(listOf(Orders.RIGHT))
-        val directionE = sut.rover.positionWithDirection.direction
-        sut.processMovementOrders(listOf(Orders.RIGHT))
-        val directionS = sut.rover.positionWithDirection.direction
-        sut.processMovementOrders(listOf(Orders.RIGHT))
-        val directionW = sut.rover.positionWithDirection.direction
-        sut.processMovementOrders(listOf(Orders.RIGHT))
-        val directionN = sut.rover.positionWithDirection.direction
+        val directionE = sut.processMovementOrders(PositionWithDirection(Position(5, 5),Directions.NORTH),  listOf(Orders.RIGHT)).positionWithDirection.direction
+        val directionS = sut.processMovementOrders(PositionWithDirection(Position(5, 5),directionE),  listOf(Orders.RIGHT)).positionWithDirection.direction
+        val directionW = sut.processMovementOrders(PositionWithDirection(Position(5, 5),directionS),  listOf(Orders.RIGHT)).positionWithDirection.direction
+        val directionN = sut.processMovementOrders(PositionWithDirection(Position(5, 5),directionW),  listOf(Orders.RIGHT)).positionWithDirection.direction
 
         // THEN
         assertEquals(Directions.EAST, directionE)
@@ -155,130 +131,96 @@ internal class DrivingServiceTest {
     }
 
     @Test
-    fun `move inside Plateau in each direction`() {
+    fun `move inside Plateau North`() {
         // GIVEN
         val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(5, 5),Directions.NORTH))
+        val plateau = sut.createPlateau(Size(10, 10))
+        val positionWithDirection = PositionWithDirection(Position(5, 5),Directions.NORTH)
 
         // WHEN
-       /* sut.processMovementOrders(listOf(Orders.MOVE))
-        val position56N = sut.rover.positionWithDirection
-        sut.processMovementOrders(listOf(Orders.RIGHT, Orders.MOVE))
-        val position66E = sut.rover.positionWithDirection
-        sut.processMovementOrders(listOf(Orders.RIGHT, Orders.MOVE))
-        val position65S = sut.rover.positionWithDirection
-        sut.processMovementOrders(listOf(Orders.RIGHT, Orders.MOVE))
-        val position55W = sut.rover.positionWithDirection
-
-        // THEN
-        assertEquals(PositionWithDirection(Position(5,6),Directions.NORTH), position56N)
-        assertEquals(PositionWithDirection(Position(6,6),Directions.EAST), position66E)
-        assertEquals(PositionWithDirection(Position(6,5),Directions.SOUTH), position65S)
-        assertEquals(PositionWithDirection(Position(5,5),Directions.WEST), position55W)*/
-
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE))
-        val position56N = sut.rover.positionWithDirection
-        // THEN
-        assertEquals(PositionWithDirection(Position(5,6),Directions.NORTH), position56N)
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.RIGHT, Orders.MOVE))
-        val position66E = sut.rover.positionWithDirection
-        // THEN
-        assertEquals(PositionWithDirection(Position(6,6),Directions.EAST), position66E)
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.RIGHT, Orders.MOVE))
-        val position65S = sut.rover.positionWithDirection
-        assertEquals(PositionWithDirection(Position(6,5),Directions.SOUTH), position65S)
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.RIGHT, Orders.MOVE))
-        val position55W = sut.rover.positionWithDirection
-        // THEN
-        assertEquals(PositionWithDirection(Position(5,5),Directions.WEST), position55W)
-        assertEquals(sut.rover.error, Errors.WITHOUT_ERRORS)
-
+        val rover = sut.processMovementOrders(positionWithDirection, listOf(Orders.MOVE))
+         // THEN
+        assertEquals(PositionWithDirection(Position(5,6),Directions.NORTH), rover.positionWithDirection)
+        assertEquals(Errors.WITHOUT_ERRORS, rover.error)
     }
 
     @Test
-    fun `Move Outside the plateau North in final position`() {
+    fun `move inside Plateau South`() {
         // GIVEN
         val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(5, 9),Directions.NORTH))
+        val plateau = sut.createPlateau(Size(10, 10))
+        val positionWithDirection = PositionWithDirection(Position(5, 5),Directions.SOUTH)
 
         // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE))
-        val result = sut.rover.error
+        val rover = sut.processMovementOrders(positionWithDirection, listOf(Orders.MOVE))
+        // THEN
+        assertEquals(PositionWithDirection(Position(5,4),Directions.SOUTH), rover.positionWithDirection)
+        assertEquals(Errors.WITHOUT_ERRORS, rover.error)
+    }
+
+    @Test
+    fun `move inside Plateau East`() {
+        // GIVEN
+        val sut = DrivingService()
+        val plateau = sut.createPlateau(Size(10, 10))
+        val positionWithDirection = PositionWithDirection(Position(5, 5),Directions.EAST)
+
+        // WHEN
+        val rover = sut.processMovementOrders(positionWithDirection, listOf(Orders.MOVE))
+        // THEN
+        assertEquals(PositionWithDirection(Position(6,5),Directions.EAST), rover.positionWithDirection)
+        assertEquals(Errors.WITHOUT_ERRORS, rover.error)
+    }
+
+    @Test
+    fun `move inside Plateau West`() {
+        // GIVEN
+        val sut = DrivingService()
+        val plateau = sut.createPlateau(Size(10, 10))
+        val positionWithDirection = PositionWithDirection(Position(5, 5),Directions.WEST)
+
+        // WHEN
+        val rover = sut.processMovementOrders(positionWithDirection, listOf(Orders.MOVE))
+        // THEN
+        assertEquals(PositionWithDirection(Position(4,5),Directions.WEST), rover.positionWithDirection)
+        assertEquals(Errors.WITHOUT_ERRORS, rover.error)
+    }
+
+    @Test
+    fun `Move Outside the plateau North`() {
+        // GIVEN
+        val sut = DrivingService()
+        val initialPosition = PositionWithDirection(Position(5, 9),Directions.NORTH)
+
+        // WHEN
+        val result = sut.processMovementOrders(initialPosition, listOf(Orders.MOVE)).error
         // THEN
         assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
     }
 
-    @Test
-    fun `Move Outside the plateau North in intermediate position`() {
-        // GIVEN
-        val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(5, 9),Directions.NORTH))
 
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE, Orders.LEFT, Orders.LEFT, Orders.MOVE))
-        val result = sut.rover.error
-        // THEN
-        assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
-    }
 
     @Test
     fun `Move Outside the plateau South in final position`() {
         // GIVEN
         val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(5, 0),Directions.SOUTH))
+        val initialPosition = PositionWithDirection(Position(5, 0),Directions.SOUTH)
 
         // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE))
-        val result = sut.rover.error
+        val result = sut.processMovementOrders(initialPosition, listOf(Orders.MOVE)).error
         // THEN
         assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
     }
 
-    @Test
-    fun `Move Outside the plateau South in intermediate position`() {
-        // GIVEN
-        val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(5, 0),Directions.SOUTH))
-
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE, Orders.LEFT, Orders.LEFT, Orders.MOVE))
-        val result = sut.rover.error
-        // THEN
-        assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
-    }
 
     @Test
     fun `Move Outside the plateau EAST in final position`() {
         // GIVEN
         val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(9, 5),Directions.EAST))
+        val initialPosition = PositionWithDirection(Position(9, 5),Directions.EAST)
 
         // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE))
-        val result = sut.rover.error
-        // THEN
-        assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
-    }
-    @Test
-    fun `Move Outside the plateau EAST in intermediate position`() {
-        // GIVEN
-        val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(9, 5),Directions.EAST))
-
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE, Orders.LEFT, Orders.LEFT, Orders.MOVE))
-        val result = sut.rover.error
+        val result = sut.processMovementOrders(initialPosition,  listOf(Orders.MOVE)).error
         // THEN
         assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
     }
@@ -287,26 +229,10 @@ internal class DrivingServiceTest {
     fun `Move Outside the plateau West in final position`() {
         // GIVEN
         val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(0, 5),Directions.WEST))
+        val initialPosition = PositionWithDirection(Position(0, 5),Directions.WEST)
 
         // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE))
-        val result = sut.rover.error
-        // THEN
-        assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
-    }
-
-    @Test
-    fun `Move Outside the plateau West in intermediate position`() {
-        // GIVEN
-        val sut = DrivingService()
-        sut.createPlateau(Size(10, 10))
-        sut.placeRover(PositionWithDirection(Position(0, 5),Directions.WEST))
-
-        // WHEN
-        sut.processMovementOrders(listOf(Orders.MOVE, Orders.LEFT, Orders.LEFT, Orders.MOVE))
-        val result = sut.rover.error
+        val result = sut.processMovementOrders(initialPosition, listOf(Orders.MOVE)).error
         // THEN
         assertEquals(Errors.ERROR_OUT_OF_PLATEAU, result)
     }

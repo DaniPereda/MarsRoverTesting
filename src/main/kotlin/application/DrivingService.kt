@@ -4,29 +4,33 @@ import domain.*
 
 class DrivingService {
 
-    var plateau = Plateau()
-    var rover = Rover()
+    private var plateau:Plateau = Plateau(Size(10,10))
 
-    fun processMovementOrders(orders: List<Orders>): PositionWithDirection {
+    fun processMovementOrders(positionWithDirection: PositionWithDirection, orders: List<Orders>): Rover {
+        var rover = Rover(positionWithDirection)
         for (order in orders) {
             rover.executeOrder(order)
-            if(!isInMap(rover.positionWithDirection.position))
+            if(!isInMap(rover.positionWithDirection.position)) {
                 rover.error = Errors.ERROR_OUT_OF_PLATEAU
+                break
+            }
         }
-        return rover.positionWithDirection
+        return rover
     }
 
     private fun isInMap(position:Position): Boolean = plateau.isInPlateau(position)
 
-    fun createPlateau(size: Size) {
+    fun createPlateau(size: Size):Plateau {
         plateau = Plateau(size)
+        return plateau
     }
 
-    fun placeRover(positionWithDirection: PositionWithDirection) {
-        if (isInMap(positionWithDirection.position)) {
-            rover = Rover(positionWithDirection)
-        } else
+    fun placeRover(positionWithDirection: PositionWithDirection):Rover {
+        var rover = Rover(positionWithDirection)
+        if (!isInMap(positionWithDirection.position))
             rover.error = Errors.ERROR_OUT_OF_PLATEAU
+
+        return rover
     }
 
 }

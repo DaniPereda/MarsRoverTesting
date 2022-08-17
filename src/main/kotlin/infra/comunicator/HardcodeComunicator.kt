@@ -11,7 +11,7 @@ class HardcodeComunicator() : Communicator {
 
     override fun retrieveInitialPosition(): Position {
 
-        return Position(2, 50)
+        return Position(2, 5)
     }
 
     override fun retrieveInitialRowDirection(): Char {

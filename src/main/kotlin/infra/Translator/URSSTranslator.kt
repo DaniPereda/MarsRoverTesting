@@ -1,9 +1,6 @@
 package infra.Translator
 
-import domain.Directions
-import domain.Orders
-import domain.PositionWithDirection
-import domain.Translator
+import domain.*
 
 class URSSTranslator : Translator {
     private enum class RowDirections(val value: Char) {
@@ -55,8 +52,19 @@ class URSSTranslator : Translator {
         }
     }
 
-    override fun positionWithDirectiontoString(positionWithDirection: PositionWithDirection):String{
-        return positionWithDirection.position.x.toString() + ":" + positionWithDirection.position.y + ":" + directionToChar(positionWithDirection.direction)
+    override fun resultToString(rover:Rover):String {
+        return when (rover.error) {
+            Errors.WITHOUT_ERRORS -> {
+                "${rover.positionWithDirection.position.x.toString()}:${rover.positionWithDirection.position.y}:${
+                    directionToChar(
+                        rover.positionWithDirection.direction
+                    )
+                }"
+            }
+            Errors.ERROR_OUT_OF_PLATEAU -> {
+                "FCFF: POOO RASSSS SZOAKIV"
+            }
+        }
     }
 
 

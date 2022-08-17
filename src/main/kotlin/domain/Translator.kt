@@ -7,7 +7,8 @@ interface Translator {
 
     fun translateOrders(orders:String):List<Orders>
 
-    fun positionWithDirectiontoString(positionWithDirection: PositionWithDirection):String
+    fun resultToString(rover:Rover):String
+
 
 
 }
