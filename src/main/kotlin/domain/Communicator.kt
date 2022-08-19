@@ -9,5 +9,5 @@ interface Communicator {
 
     fun retrieveSizeMap():Size
     fun printPositionWithDirection(formattedPositionWithDirection:String)
-    fun printError(formattedPositionWithDirection:String)
+    fun printError(errorCode:Errors)
 }

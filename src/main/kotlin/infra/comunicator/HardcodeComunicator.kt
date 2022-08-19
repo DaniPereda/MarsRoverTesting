@@ -1,12 +1,13 @@
 package infra.comunicator
 
 import domain.Communicator
+import domain.Errors
 import domain.Position
 import domain.Size
 
 class HardcodeComunicator() : Communicator {
     override fun retrieveOrders(): String {
-        return "MLLMMRM"
+        return "MMMLLMMRM"
     }
 
     override fun retrieveInitialPosition(): Position {
@@ -30,8 +31,9 @@ class HardcodeComunicator() : Communicator {
         println("the final position is  $formattedPositionWithDirection")
     }
 
-    override fun printError(formattedPositionWithDirection: String) {
-        println("ERROR-OUT OF PLATEAU")
+    override fun printError(error: Errors) {
+        if (error == Errors.ERROR_OUT_OF_PLATEAU)
+            println("ERROR-OUT OF PLATEAU")
     }
 
 }

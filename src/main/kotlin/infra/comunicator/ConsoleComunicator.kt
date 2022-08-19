@@ -1,6 +1,7 @@
 package infra.comunicator
 
 import domain.Communicator
+import domain.Errors
 import domain.Position
 import domain.Size
 
@@ -41,7 +42,8 @@ class ConsoleComunicator() : Communicator {
         println("y la posicion es  $formattedPositionWithDirection")
     }
 
-    override fun printError(formattedPositionWithDirection: String) {
-        println("ERROR-OUT OF PLATEAU")
+    override fun printError(error: Errors) {
+        if (error == Errors.ERROR_OUT_OF_PLATEAU)
+            println("ERROR-OUT OF PLATEAU")
     }
 }
